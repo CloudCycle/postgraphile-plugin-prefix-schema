@@ -73,3 +73,10 @@ app.use(
   })
 );
 ```
+
+Roadmap
+-------
+
+* Add unit tests
+* Provide a way to specify the prefix explicitly. This will allow using this plugin where multiple SQL schemas are specified.
+
