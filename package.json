@@ -1,5 +1,5 @@
 {
-  "name": "postgraphile-plugin-prefix-schema",
+  "name": "@cloudcycle/postgraphile-plugin-prefix-schema",
   "version": "0.0.1",
   "description": "Postgraphile plugin which prefixes the SQL schema to GraphQL types",
   "main": "build/index.js",

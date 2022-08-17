@@ -16,12 +16,12 @@ Install using NPM or Yarn:
 NPM:
 
 ```bash
-npm install --save postgraphile-plugin-prefix-schema
+npm install --save @cloudcycle/postgraphile-plugin-prefix-schema
 ```
 
 Yarn:
 ```bash
-yarn add postgraphile-plugin-prefix-schema
+yarn add @cloudcycle/postgraphile-plugin-prefix-schema
 ```
 
 Usage
@@ -30,13 +30,13 @@ Usage
 CLI:
 
 ```bash
-postgraphile --append-plugins postgraphile-plugin-prefix-schema
+postgraphile --append-plugins @cloudcycle/postgraphile-plugin-prefix-schema
 ```
 
 Library:
 
 ```javascript
-import prefixSchemaPlugin from 'postgraphile-plugin-prefix-schema';
+import prefixSchemaPlugin from '@cloudcycle/postgraphile-plugin-prefix-schema';
 ```
 
 Then add it to the appendPlugins array. E.g.:
