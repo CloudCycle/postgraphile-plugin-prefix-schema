@@ -9,10 +9,9 @@ class NameMappings {
             throw new Error("Name mapping resulted in an empty string");
         }
         add(this.mappedNames, mappedName);
-        return mappedName;
     }
 
-    public startsWithMappedName(
+    public startsWithMappingOutputName(
         name: string,
     ): boolean {
         for (let lengthToConsider = name.length; lengthToConsider > 0; ) {
@@ -50,27 +49,32 @@ export const SchemaPrepend = makeAddInflectorsPlugin(
 
         const nameMappings = new NameMappings();
         const camelCaseSchema = (inflection.camelCase)(options.pgSchemas[0]);
+        const upperCamelCaseSchema = (inflection.upperCamelCase)(options.pgSchemas[0]);
+
+        function prependPreservingCase(orig: string): string {
+            if (orig === orig.toUpperCase()) {
+                const upperCaseSchema = inflection.constantCase(options.pgSchemas[0]);
+                return `${upperCaseSchema}_${orig}`;
+            } else if (orig[0] === orig[0].toUpperCase()) {
+                return upperCamelCaseSchema + orig;
+            }
+            return camelCaseSchema + orig[0].toUpperCase() + orig.slice(1);
+        }
+
         function makePrepend(f: (...args: any[]) => any) {
             return (...args: any[]) => {
                 const fResult = f.apply(inflection, args);
                 if (
                     (typeof(fResult) !== "string") ||
-                    (nameMappings.startsWithMappedName(fResult))
+                    (nameMappings.startsWithMappingOutputName(fResult))
                 ) {
                     return fResult;
-                } else if (fResult === fResult.toUpperCase()) {
-                    const upperCaseSchema = options.pgSchemas[0].toUpperCase();
-                    return nameMappings.add(
-                        `${upperCaseSchema}_${fResult}`,
-                    );
-                } else if (fResult[0] === fResult[0].toUpperCase()) {
-                    return nameMappings.add(
-                        camelCaseSchema[0].toUpperCase() + camelCaseSchema.slice(1) + fResult,
-                    );
                 }
-                return nameMappings.add(
-                    camelCaseSchema + fResult[0].toUpperCase() + fResult.slice(1),
-                );
+                else {
+                    const transformedName = prependPreservingCase(fResult);
+                    nameMappings.add(transformedName);
+                    return transformedName;
+                }
             };
         }
 
