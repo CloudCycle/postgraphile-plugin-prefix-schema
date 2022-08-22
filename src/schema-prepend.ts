@@ -1,6 +1,22 @@
 import { makeAddInflectorsPlugin } from "graphile-utils";
 import { add, lte } from "sorted-array-functions";
 
+function nameMutationPrefix(name: string): string | undefined {
+    if (! name) {
+        return undefined;
+    }
+    const mutationPrefixes = [
+        'create',
+        'update',
+        'delete',
+        'upsert'
+    ];
+    const nameLc = name[0].toLowerCase() + name.slice(1);
+    return mutationPrefixes.find(
+        s => nameLc.startsWith(s) || name.startsWith(`${s.toUpperCase()}_`)
+    );
+}
+
 class NameMappings {
     private mappedNames: string[] = [];
 
@@ -64,28 +80,32 @@ export const SchemaPrepend = makeAddInflectorsPlugin(
         function makePrepend(f: (...args: any[]) => any) {
             return (...args: any[]) => {
                 const fResult = f.apply(inflection, args);
-                if (
-                    (typeof(fResult) !== "string") ||
-                    (nameMappings.startsWithMappingOutputName(fResult))
-                ) {
+                if (typeof(fResult) !== "string") {
                     return fResult;
                 }
                 else {
-                    const transformedName = prependPreservingCase(fResult);
-                    nameMappings.add(transformedName);
-                    return transformedName;
+                    const prefixToPreserve = nameMutationPrefix(fResult) ?? '';
+                    const nameAfterPrefix = fResult.slice(prefixToPreserve.length);
+                    if (nameMappings.startsWithMappingOutputName(nameAfterPrefix)) {
+                        return fResult;
+                    }
+                    else {
+                        const transformedName = prependPreservingCase(nameAfterPrefix);
+                        nameMappings.add(transformedName);
+                        return prefixToPreserve + transformedName;
+                    }
                 }
             };
         }
 
-        const typeMethods = Object.entries(inflection).filter(
-            (e) => e[0].endsWith("Type"),
+        const methodsToWrap = Object.entries(inflection).filter(
+            (e) => e[0].endsWith("Type") || nameMutationPrefix(e[0]),
         ).map(
             (e) => [e[0], makePrepend(e[1])],
         );
         const modifiedInflectors = {
             ...inflection,
-            ...Object.fromEntries(typeMethods),
+            ...Object.fromEntries(methodsToWrap),
         };
         return modifiedInflectors;
     },
