@@ -79,7 +79,7 @@ export const SchemaPrepend = makeAddInflectorsPlugin(
 
         function makePrepend(f: (...args: any[]) => any) {
             return (...args: any[]) => {
-                const fResult = f.apply(inflection, args);
+                const fResult = f.apply(modifiedInflectors, args);
                 if (typeof(fResult) !== "string") {
                     return fResult;
                 }
@@ -103,7 +103,7 @@ export const SchemaPrepend = makeAddInflectorsPlugin(
         ).map(
             (e) => [e[0], makePrepend(e[1])],
         );
-        const modifiedInflectors = {
+        const modifiedInflectors: typeof inflection = {
             ...inflection,
             ...Object.fromEntries(methodsToWrap),
         };
