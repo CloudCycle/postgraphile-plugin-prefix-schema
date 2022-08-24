@@ -99,7 +99,10 @@ export const SchemaPrepend = makeAddInflectorsPlugin(
         }
 
         const methodsToWrap = Object.entries(inflection).filter(
-            (e) => e[0].endsWith("Type") || nameMutationPrefix(e[0]),
+            (e) => e[0].endsWith("Type") ||
+            nameMutationPrefix(e[0]) ||
+            e[0].includes('RelationBy') ||
+            ['tableNode', 'getBaseName', 'getBaseNameFromKeys'].includes(e[0]),
         ).map(
             (e) => [e[0], makePrepend(e[1])],
         );
