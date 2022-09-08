@@ -9,6 +9,8 @@ Limitations
 
 Only a single SQL schema may be used. If multiple schemas are used (which PostGraphile allows), the plugin will abort with an error.
 
+The plugin makes no attempt to adjust the names of enums which are specified using smart-comments on tables.
+
 Installation
 ------------
 
